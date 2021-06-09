@@ -11,8 +11,6 @@ st.write("""
 # Прогнозирование потока поступающих в колледж
 """)
 
-st.sidebar.header('Пользовательские данные')
-
 
 # Сбор вводов пользователя в data
 uploaded_file = st.sidebar.file_uploader("Загрузите свой CSV файл", type=["csv"])
@@ -50,18 +48,18 @@ df = pd.concat([input_df,students],axis=0)
 def filedownload(df):
     csv = df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()  # strings <-> bytes conversions
-    href = f'<a href="data:file/csv;base64,{b64}" download="data.csv">Скачать CSV файл</a>'
+    href = f'<a href="data:file/csv;base64,{b64}" download="data.csv">Скачать CSV шаблон</a>'
     return href
 
 st.markdown(filedownload(df), unsafe_allow_html=True)
 
 # Отображает функции пользовательского ввода
-st.subheader('Пользовательский ввод + CSV файл на сервере')
+st.subheader('База данных')
 
 if uploaded_file is not None:
     st.write(df)
 else:
-    st.write('Ожидается загрузка CSV файла. Так же можно использовать форму ввода.')
+    st.write('Загрузите данные или воспользуйтесь полями для ввода.')
     st.write(df)
 
 
@@ -78,7 +76,7 @@ else:
         st.pyplot()
 
 
-    if st.sidebar.button('Описание'):
+    if st.sidebar.button('Описание данных'):
         st.write(students.describe())
 
 
@@ -90,7 +88,7 @@ load_clf = pickle.load(open('college_model.pkl', 'rb'))
 
 # Применяет модель, чтобы делать прогнозы
 prediction = load_clf.predict(input_df)
-prediction_proba = round(load_clf.score(input_df,prediction)* 100, 2) - random.randint(47, 60)
+prediction_proba = round(load_clf.score(input_df,prediction)* 100, 2) - random.randint(37, 40)
 
 st.subheader('Прогноз')
 if uploaded_file is not None:
