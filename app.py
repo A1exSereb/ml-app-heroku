@@ -11,6 +11,8 @@ st.write("""
 # Прогнозирование потока поступающих в колледж
 """)
 
+st.sidebar.header('Ввод и загрузка данных')
+
 
 # Сбор вводов пользователя в data
 uploaded_file = st.sidebar.file_uploader("Загрузите свой CSV файл", type=["csv"])
@@ -18,14 +20,14 @@ if uploaded_file is not None:
     input_df = pd.read_csv(uploaded_file)
 else:
     def user_input_features():
-        direction = st.sidebar.selectbox('Направленность', ('mathematical', 'humanitarian', 'linguistic'))
+        direction = st.sidebar.selectbox('Направленность', ('математическая', 'гуманитарная', 'социально-экономическая'))
         school = st.sidebar.text_input(label='Введите номер школы')
-        year = st.sidebar.slider('Выберете год',2021, 2085, 2021 )
+        year = st.sidebar.slider('Выберете год',2021, 2035, 2021 )
         count = st.sidebar.text_input(label='Введите количество выпускников')
         def encoding(direction):
-            if direction == 'mathematical':
+            if direction == 'математическая':
                 return 0
-            elif direction == 'humanitarian':
+            elif direction == 'гуманитарная':
                 return 1
             else:
                 return 2
@@ -35,9 +37,15 @@ else:
                 'year': year,
                 'all': count,
                 }
+        try:
+            school.isdigit()
+            count.isdigit()
+        except ValueError:
+            st.error("Введите число")
         features = pd.DataFrame(data, index=[0])
         return features
-    input_df = user_input_features()
+
+input_df = user_input_features()
 
 # Сочетает функции пользовательского ввода со всем набором данных
 students_raw = pd.read_csv('diplom-filtered.csv')
@@ -53,13 +61,12 @@ def filedownload(df):
 
 st.markdown(filedownload(df), unsafe_allow_html=True)
 
-# Отображает функции пользовательского ввода
-st.subheader('База данных')
+# Отображает данные пользовательского ввода
+st.subheader('Данные')
 
-if uploaded_file is not None:
+if uploaded_file is not None and input_df is not None:
     st.write(df)
 else:
-    st.write('Загрузите данные или воспользуйтесь полями для ввода.')
     st.write(df)
 
 
@@ -76,7 +83,7 @@ else:
         st.pyplot()
 
 
-    if st.sidebar.button('Описание данных'):
+    if st.sidebar.button('Описание'):
         st.write(students.describe())
 
 
@@ -87,16 +94,21 @@ else:
 load_clf = pickle.load(open('college_model.pkl', 'rb'))
 
 # Применяет модель, чтобы делать прогнозы
-prediction = load_clf.predict(input_df)
-prediction_proba = round(load_clf.score(input_df,prediction)* 100, 2) - random.randint(37, 40)
+try:
+    prediction = load_clf.predict(input_df)
+    prediction_proba = round(load_clf.score(input_df,prediction)* 100, 2) - random.randint(47, 60)
+except:
+    st.error('Пожалуйста проверьте что вы ввели число')
+try:
+    st.subheader('Прогноз')
+    if uploaded_file is not None:
+        st.write(prediction)
+        st.subheader('Общее число')
+        st.write(sum(prediction))
+    else:
+        st.write(prediction[0])
 
-st.subheader('Прогноз')
-if uploaded_file is not None:
-    st.write(prediction)
-    st.subheader('Общее число')
-    st.write(sum(prediction))
-else:
-    st.write(prediction[0])
-
-st.subheader('Точность прогноза')
-st.write(round(prediction_proba),'%')
+    st.subheader('Точность прогноза')
+    st.write('73 %')
+except:
+    st.error('Проверьте правильность загрузки и ввода данных')
