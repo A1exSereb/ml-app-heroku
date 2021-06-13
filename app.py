@@ -45,7 +45,7 @@ else:
         features = pd.DataFrame(data, index=[0])
         return features
 
-input_df = user_input_features()
+    input_df = user_input_features()
 
 # Сочетает функции пользовательского ввода со всем набором данных
 students_raw = pd.read_csv('diplom-filtered.csv')
