@@ -25,9 +25,9 @@ else:
         year = st.sidebar.slider('Выберете год',2021, 2035, 2021 )
         count = st.sidebar.text_input(label='Введите количество выпускников')
         def encoding(direction):
-            if direction == 'математическая':
+            if direction == 'гуманитарная':
                 return 0
-            elif direction == 'гуманитарная':
+            elif direction == 'социально-экономическая':
                 return 1
             else:
                 return 2
